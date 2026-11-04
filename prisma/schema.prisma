@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Trip {
+  id                 String        @id @default(uuid()) @db.Uuid
+  prompt             String
+  parsedPrompt       Json
+  generatedItinerary Json
+  bookingLeads       BookingLead[]
+  createdAt          DateTime      @default(now())
+
+  @@map("trips")
+}
+
+model BookingLead {
+  id                 String   @id @default(uuid()) @db.Uuid
+  name               String
+  email              String
+  phone              String?
+  telegramOrWhatsapp String?
+  travelers          Int?
+  budget             String?
+  message            String?
+  helpNeeded         String[]
+  tripId             String?  @db.Uuid
+  trip               Trip?    @relation(fields: [tripId], references: [id], onDelete: SetNull)
+  createdAt          DateTime @default(now())
+
+  @@map("booking_leads")
+}
+
+model Place {
+  id             String   @id @default(uuid()) @db.Uuid
+  name           String
+  slug           String   @unique
+  description    String
+  region         String
+  category       String
+  latitude       Float
+  longitude      Float
+  tags           String[]
+  seasonality    String[]
+  familyFriendly Boolean  @default(true)
+  createdAt      DateTime @default(now())
+
+  @@index([region])
+  @@index([category])
+  @@map("places")
+}
